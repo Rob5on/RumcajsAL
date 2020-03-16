@@ -81,12 +81,7 @@ function myjsapp(peerClient) {
             }
         });
 
-        $('.end-call').click(function (event) {
-            // clear CSS for mute buttons
-            $('.mute-audio, .mute-video').removeClass('btn-success').addClass('btn-secondary')
-            // End established call
-            peerClient.endCall();
-        })
+        
 
         $('#user-name').keypress(function (event) {
             if (13 == event.which) {
@@ -104,37 +99,6 @@ function myjsapp(peerClient) {
         })
 
         
-        $('.accept-call').click(function (event) {
-            // End established call
-            peerClient.acceptIncomingCall();
-        })
-        $('.reject-call').click(function (event) {
-            // End established call
-            peerClient.rejectIncomingCall();
-        })
-
-        $('.mute-audio').click(function (event) {
-            if($(this).hasClass('btn-secondary')) {
-                $(this).removeClass('btn-secondary').addClass('btn-success')
-                // End established call
-                peerClient.muteAudio(false);
-            } else {
-                $(this).removeClass('btn-success').addClass('btn-secondary')
-                peerClient.muteAudio(true);
-            }
-        })
-        $('.mute-video').click(function (event) {
-            if($(this).hasClass('btn-secondary')) {
-                $(this).removeClass('btn-secondary').addClass('btn-success')
-                // End established call
-                peerClient.muteVideo(false);
-            } else {
-                $(this).removeClass('btn-success').addClass('btn-secondary')
-                peerClient.muteVideo(true);
-            }
-        })
-    }
-
     function appendToHistory(id, message, isSent) {
         if(chatHistory[id]) {
             var hist = chatHistory[id];
@@ -178,11 +142,8 @@ function myjsapp(peerClient) {
             var history = $('<ul class="chatHistory"></ul>')
             var message = $('<input type="text" class="form-control" placeholder="Enter Message">')
             var sendBtn = $('<button type="button" class="btn btn-outline-primary">Send</button>')
-            var callButton = $('<a class="portfolio-link">');
-            var videoCall = $('<i class="fa fa-video-camera fa-2x call-icon" aria-hidden="true"></i>');
-            var audioCall = $('<i class="fa fa-phone fa-2x call-icon" aria-hidden="true"></i></a>');
 
-            callButton.append(audioCall).append(videoCall);
+            
 
             chatHistory[toPeerId] = history
             chatPanel[toPeerId] = panel
@@ -224,19 +185,7 @@ function myjsapp(peerClient) {
                 }
             });
 
-            audioCall.click(function (event) {
-                // initializeLocalVideo()
-                var isVideoCall = false;
-                peerClient.makeCall(toPeerId, isVideoCall);
-                return false
-            })
-
-            videoCall.click(function (event) {
-                // initializeLocalVideo()
-                var isVideoCall = true;
-                peerClient.makeCall(toPeerId, isVideoCall);
-                return false
-            })
+           
             // TODO - Hide panels if more than 3
         },
 
@@ -249,44 +198,8 @@ function myjsapp(peerClient) {
                 delete chatHistory[id]
             }
         },
-        showVideoCall : function (options) {
-            $('#videoCallPanel').modal('show')
-            if(options['video'])
-                $('#videoCallPanel .title').text('Video Call')
-            else
-                $('#videoCallPanel .title').text('Voice Call')
-        },
-        showIncomingCall : function (peerId, options) {
-            $('#callConfirmationModal').modal('show')
-            if(options['video'])
-                var txt = "Incoming Video call from : " + peerId
-            else
-                var txt = "Incoming Voice call from : " + peerId
-            $('#callConfirmationModal .peer-name').text(txt)
-        },
-        closeVideoCall : function () {
-            $('.end-call').click()
-        },
-        setTheirVideo : function (stream) {
-            var video = document.getElementById('their-video');
-            if (typeof video.srcObject == "object") {
-                video.srcObject = stream;
-            } else {
-                video.src = URL.createObjectURL(stream);
-            }
-        },
-        setMyVideo : function (stream) {
-            // $('#my-video').prop('src', stream);
-            var video = document.getElementById('my-video');
-            if (typeof video.srcObject == "object") {
-                video.srcObject = stream;
-            } else {
-                video.src = URL.createObjectURL(stream);
-            }
-        },
-        showError : function (msg) {
-            
-        },
+        
+
         updateOnlieUsers : function (users) {
             var list = $('.onlinepeers')
             list.empty()

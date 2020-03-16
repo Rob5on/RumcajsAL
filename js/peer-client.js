@@ -172,14 +172,8 @@ peerapp = (function() {
     }, 5000)
 
     return {
-        makeCall : makeCall,
-        endCall : endCall,
         sendMessage : sendMessage,
         connectToId : connectToId,
         connectToServerWithId : connectToServerWithId,
-        acceptIncomingCall : acceptIncomingCall,
-        rejectIncomingCall : rejectIncomingCall,
-        muteAudio : muteAudio,
-        muteVideo : muteVideo
     }
 })();
