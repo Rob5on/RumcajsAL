@@ -70,7 +70,61 @@ peerapp = (function() {
             });
         }
     }
-   
+
+    // Handle Audio and Video Calls
+    function callConnect(call) {
+        
+        // Hang up on an existing call if present
+        if (window.existingCall) {
+            window.existingCall.close();
+        }
+
+        // Wait for stream on the call, then set peer video display
+        call.on('stream', function(stream) {
+            myapp.setTheirVideo(stream)
+        });
+
+        // UI stuff
+        window.existingCall = call;
+        call.on('close', function() {
+            console.log("Call Ending")
+            myapp.closeVideoCall()
+        });
+    }
+
+    function peerCallbacks(peer) {
+        peer.on('open', function(id) {
+            console.log('My peer ID is: ' + id);
+            console.log(new Date());
+            myapp.setPeerId(id);
+            fetchOnlinePeers();
+        });
+
+        peer.on('connection', connect);
+
+        peer.on('call', function(call) {
+            console.log("Receiving a call")
+            console.log(call)
+            // New call requests from users
+            // Ask Confirm before accepting call
+            // if(window.incomingCall) {
+            //     window.incomingCall.answer()
+            //     setTimeout(function () {
+            //         window.incomingCall.close();
+            //         window.incomingCall = call
+            //         myapp.showIncomingCall(call.peer);
+            //     }, 1000)
+            // } else {
+            if(window.existingCall) {
+                // If already in a call, rejecting the new calls
+                rejectIncomingCall(call)
+            } else {
+                window.incomingCall = call
+                myapp.showIncomingCall(call.peer, call.options.metadata);
+            }
+            // }
+        });
+
         peer.on('close', function(conn) {
             // New connection requests from users
             console.log("Peer connection closed");
@@ -139,6 +193,96 @@ peerapp = (function() {
         }
     }
 
+    function initializeLocalMedia(options, callback) {
+
+        if(options) {
+            options['audio'] = true;
+            if(options['video'])
+                options['video'] = true;
+        } else {
+            options['audio'] = true;
+            options['video'] = false;
+        }
+
+        // Get audio/video stream
+        navigator.getUserMedia(options, function(stream) {
+            // Set your video displays
+            window.localStream = stream;
+            myapp.setMyVideo(window.localStream)
+            if(callback)
+                callback();
+        }, function(err) {
+            console.log("The following error occurred: " + err.name);
+            alert('Unable to call ' + err.name)
+        });
+    }
+
+    function makeCall(callerID, isVideoCall) {
+        console.log("Calling..." +  callerID)
+        
+        var options = {audio: true};
+        if(isVideoCall)
+            options['video'] = true;
+
+        initializeLocalMedia(options, function() {
+            myapp.showVideoCall(options)
+            var call = peer.call(callerID, window.localStream, { 'metadata' : options });
+            callConnect(call)
+        });
+    }
+
+    function acceptIncomingCall() {
+        var call = window.incomingCall;
+        var metadata = call.options.metadata;
+        console.log(metadata);
+
+        initializeLocalMedia(metadata, function() {
+            call.answer(window.localStream);
+            myapp.showVideoCall(metadata);
+            callConnect(call)
+        });
+    }
+
+    function rejectIncomingCall(reCall) {
+        var call = reCall || window.incomingCall;
+        var metadata = call.options.metadata;
+        console.log(metadata);
+        console.log("Rejecting incomingCall")
+        call.answer();
+        setTimeout(function () {
+            call.close();  
+        }, 1000)
+    }
+
+    function endCall() {
+        if(window.existingCall)
+            window.existingCall.close();
+        window.existingCall = null
+    }
+
+    function muteAudio(status) {
+        if(status == false)
+            status = false
+        else 
+            status = true
+        if(window.localStream) {
+            var audioTracks = window.localStream.getAudioTracks()
+            if(audioTracks && audioTracks[0])
+                audioTracks[0].enabled = status;
+        }
+    }
+
+    function muteVideo(status) {
+        if(status == false)
+            status = false
+        else 
+            status = true
+        if(window.localStream) {
+            var videoTracks = window.localStream.getVideoTracks()
+            if(videoTracks && videoTracks[0])
+                videoTracks[0].enabled = status;
+        }
+    }
 
     function closeConnection(id) {
         var conns = peer.connections[peerId];
@@ -172,8 +316,14 @@ peerapp = (function() {
     }, 5000)
 
     return {
+        makeCall : makeCall,
+        endCall : endCall,
         sendMessage : sendMessage,
         connectToId : connectToId,
         connectToServerWithId : connectToServerWithId,
+        acceptIncomingCall : acceptIncomingCall,
+        rejectIncomingCall : rejectIncomingCall,
+        muteAudio : muteAudio,
+        muteVideo : muteVideo
     }
 })();
