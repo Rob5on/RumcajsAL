@@ -71,26 +71,6 @@ peerapp = (function() {
         }
     }
 
-    // Handle Audio and Video Calls
-    function callConnect(call) {
-        
-        // Hang up on an existing call if present
-        if (window.existingCall) {
-            window.existingCall.close();
-        }
-
-        // Wait for stream on the call, then set peer video display
-        call.on('stream', function(stream) {
-            myapp.setTheirVideo(stream)
-        });
-
-        // UI stuff
-        window.existingCall = call;
-        call.on('close', function() {
-            console.log("Call Ending")
-            myapp.closeVideoCall()
-        });
-    }
 
     function peerCallbacks(peer) {
         peer.on('open', function(id) {
