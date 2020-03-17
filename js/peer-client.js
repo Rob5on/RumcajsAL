@@ -163,19 +163,6 @@ peerapp = (function() {
 
 
 
-    function makeCall(callerID, isVideoCall) {
-        console.log("Calling..." +  callerID)
-        
-        var options = {audio: true};
-        if(isVideoCall)
-            options['video'] = true;
-
-        initializeLocalMedia(options, function() {
-            myapp.showVideoCall(options)
-            var call = peer.call(callerID, window.localStream, { 'metadata' : options });
-            callConnect(call)
-        });
-    }
 
     function acceptIncomingCall() {
         var call = window.incomingCall;
@@ -256,7 +243,6 @@ peerapp = (function() {
         });
     }
 
-    // Update Online users on every 5 seconds
     setInterval(function () {
         fetchOnlinePeers()
     }, 5000)
