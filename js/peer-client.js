@@ -27,9 +27,7 @@ peerapp = (function() {
      connectToServerWithId(myPeerID);
     console.log(peer)
 
-    initializeLocalMedia({'audio': true, 'video': true});
 
-    // Generate random ID
     function generateRandomID(length) {
         var chars = '123456789abcdefghijklmnopqrstuvwxyz'
         var result = '';
