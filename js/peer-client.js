@@ -55,40 +55,10 @@ peerapp = (function() {
                 myapp.closeChatWindow(c.peer)
             });
             connectedPeers[c.peer] = c;
-        } else if (c.label === 'file') {
-            c.on('data', function(data) {
-                // If we're getting a file, create a URL for it.
-                if (data.constructor === ArrayBuffer) {
-                    var dataView = new Uint8Array(data);
-                    var dataBlob = new Blob([dataView]);
-                    var url = window.URL.createObjectURL(dataBlob);
-                    // $('#' + c.peer).find('.messages').append('<div><span class="file">' +
-                    //     c.peer + ' has sent you a <a target="_blank" href="' + url + '">file</a>.</span></div>');
-                }
-            });
         }
     }
 
-    // Handle Audio and Video Calls
-    function callConnect(call) {
-        
-        // Hang up on an existing call if present
-        if (window.existingCall) {
-            window.existingCall.close();
-        }
 
-        // Wait for stream on the call, then set peer video display
-        call.on('stream', function(stream) {
-            myapp.setTheirVideo(stream)
-        });
-
-        // UI stuff
-        window.existingCall = call;
-        call.on('close', function() {
-            console.log("Call Ending")
-            myapp.closeVideoCall()
-        });
-    }
 
     function peerCallbacks(peer) {
         peer.on('open', function(id) {
