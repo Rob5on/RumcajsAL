@@ -197,72 +197,9 @@ peerapp = (function() {
         });
     }
 
-    function makeCall(callerID, isVideoCall) {
-        console.log("Calling..." +  callerID)
-        
-        var options = {audio: true};
-        if(isVideoCall)
-            options['video'] = true;
+    
 
-        initializeLocalMedia(options, function() {
-            myapp.showVideoCall(options)
-            var call = peer.call(callerID, window.localStream, { 'metadata' : options });
-            callConnect(call)
-        });
-    }
-
-    function acceptIncomingCall() {
-        var call = window.incomingCall;
-        var metadata = call.options.metadata;
-        console.log(metadata);
-
-        initializeLocalMedia(metadata, function() {
-            call.answer(window.localStream);
-            myapp.showVideoCall(metadata);
-            callConnect(call)
-        });
-    }
-
-    function rejectIncomingCall(reCall) {
-        var call = reCall || window.incomingCall;
-        var metadata = call.options.metadata;
-        console.log(metadata);
-        console.log("Rejecting incomingCall")
-        call.answer();
-        setTimeout(function () {
-            call.close();  
-        }, 1000)
-    }
-
-    function endCall() {
-        if(window.existingCall)
-            window.existingCall.close();
-        window.existingCall = null
-    }
-
-    function muteAudio(status) {
-        if(status == false)
-            status = false
-        else 
-            status = true
-        if(window.localStream) {
-            var audioTracks = window.localStream.getAudioTracks()
-            if(audioTracks && audioTracks[0])
-                audioTracks[0].enabled = status;
-        }
-    }
-
-    function muteVideo(status) {
-        if(status == false)
-            status = false
-        else 
-            status = true
-        if(window.localStream) {
-            var videoTracks = window.localStream.getVideoTracks()
-            if(videoTracks && videoTracks[0])
-                videoTracks[0].enabled = status;
-        }
-    }
+  
 
     function closeConnection(id) {
         var conns = peer.connections[peerId];
