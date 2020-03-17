@@ -200,17 +200,7 @@ peerapp = (function() {
         }
     }
 
-    function muteVideo(status) {
-        if(status == false)
-            status = false
-        else 
-            status = true
-        if(window.localStream) {
-            var videoTracks = window.localStream.getVideoTracks()
-            if(videoTracks && videoTracks[0])
-                videoTracks[0].enabled = status;
-        }
-    }
+
 
     function closeConnection(id) {
         var conns = peer.connections[peerId];
