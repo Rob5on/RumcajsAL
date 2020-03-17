@@ -187,11 +187,6 @@ peerapp = (function() {
         }, 1000)
     }
 
-    function endCall() {
-        if(window.existingCall)
-            window.existingCall.close();
-        window.existingCall = null
-    }
 
     function muteAudio(status) {
         if(status == false)
