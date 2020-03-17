@@ -134,7 +134,7 @@ function myjsapp(peerClient) {
             }
         })
     }
-
+//historia czatu
     function appendToHistory(id, message, isSent) {
         if(chatHistory[id]) {
             var hist = chatHistory[id];
@@ -224,20 +224,7 @@ function myjsapp(peerClient) {
                 }
             });
 
-            audioCall.click(function (event) {
-                // initializeLocalVideo()
-                var isVideoCall = false;
-                peerClient.makeCall(toPeerId, isVideoCall);
-                return false
-            })
 
-            videoCall.click(function (event) {
-                // initializeLocalVideo()
-                var isVideoCall = true;
-                peerClient.makeCall(toPeerId, isVideoCall);
-                return false
-            })
-            // TODO - Hide panels if more than 3
         },
 
         appendHistory : appendToHistory,
@@ -249,41 +236,7 @@ function myjsapp(peerClient) {
                 delete chatHistory[id]
             }
         },
-        showVideoCall : function (options) {
-            $('#videoCallPanel').modal('show')
-            if(options['video'])
-                $('#videoCallPanel .title').text('Video Call')
-            else
-                $('#videoCallPanel .title').text('Voice Call')
-        },
-        showIncomingCall : function (peerId, options) {
-            $('#callConfirmationModal').modal('show')
-            if(options['video'])
-                var txt = "Incoming Video call from : " + peerId
-            else
-                var txt = "Incoming Voice call from : " + peerId
-            $('#callConfirmationModal .peer-name').text(txt)
-        },
-        closeVideoCall : function () {
-            $('.end-call').click()
-        },
-        setTheirVideo : function (stream) {
-            var video = document.getElementById('their-video');
-            if (typeof video.srcObject == "object") {
-                video.srcObject = stream;
-            } else {
-                video.src = URL.createObjectURL(stream);
-            }
-        },
-        setMyVideo : function (stream) {
-            // $('#my-video').prop('src', stream);
-            var video = document.getElementById('my-video');
-            if (typeof video.srcObject == "object") {
-                video.srcObject = stream;
-            } else {
-                video.src = URL.createObjectURL(stream);
-            }
-        },
+        
         showError : function (msg) {
             
         },

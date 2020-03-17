@@ -23,11 +23,12 @@ peerapp = (function() {
         peer = new Peer(myPeerID, { host: PEER_SERVER, port: PORT, path: '/', secure: true });  
         peerCallbacks(peer);
     }    
-     var peer = new Peer({ host: 'my-peer.herokuapp.com', port: '443', path: '/', secure: true });
-     connectToServerWithId(myPeerID);
+    // var peer = new Peer({ host: 'my-peer.herokuapp.com', port: '443', path: '/', secure: true });
+    // connectToServerWithId(myPeerID);
     console.log(peer)
 
 
+    // Generate random ID
     function generateRandomID(length) {
         var chars = '123456789abcdefghijklmnopqrstuvwxyz'
         var result = '';
@@ -55,9 +56,8 @@ peerapp = (function() {
                 myapp.closeChatWindow(c.peer)
             });
             connectedPeers[c.peer] = c;
-        }
+        } 
     }
-
 
 
     function peerCallbacks(peer) {
@@ -70,28 +70,6 @@ peerapp = (function() {
 
         peer.on('connection', connect);
 
-        peer.on('call', function(call) {
-            console.log("Receiving a call")
-            console.log(call)
-            // New call requests from users
-            // Ask Confirm before accepting call
-            // if(window.incomingCall) {
-            //     window.incomingCall.answer()
-            //     setTimeout(function () {
-            //         window.incomingCall.close();
-            //         window.incomingCall = call
-            //         myapp.showIncomingCall(call.peer);
-            //     }, 1000)
-            // } else {
-            if(window.existingCall) {
-                // If already in a call, rejecting the new calls
-                rejectIncomingCall(call)
-            } else {
-                window.incomingCall = call
-                myapp.showIncomingCall(call.peer, call.options.metadata);
-            }
-            // }
-        });
 
         peer.on('close', function(conn) {
             // New connection requests from users
@@ -127,7 +105,7 @@ peerapp = (function() {
             }
         });
     };
-
+//Łączenie się do użytkownika
     function connectToId(id) {
         if(!id || peer.disconnected)
             return;
@@ -144,12 +122,6 @@ peerapp = (function() {
             });
             c.on('error', function(err) { alert(err); });
 
-            // File Sharing
-            // var f = peer.connect(requestedPeer, { label: 'file', reliable: true });
-            // f.on('open', function() {
-            //     connect(f);
-            // });
-            // f.on('error', function(err) { alert(err); });
         }
     }
 
@@ -162,7 +134,19 @@ peerapp = (function() {
     }
 
 
+    function makeCall(callerID, isVideoCall) {
+        console.log("Calling..." +  callerID)
+        
+        var options = {audio: true};
+        if(isVideoCall)
+            options['video'] = true;
 
+        initializeLocalMedia(options, function() {
+            myapp.showVideoCall(options)
+            var call = peer.call(callerID, window.localStream, { 'metadata' : options });
+            callConnect(call)
+        });
+    }
 
     function acceptIncomingCall() {
         var call = window.incomingCall;
@@ -187,6 +171,11 @@ peerapp = (function() {
         }, 1000)
     }
 
+    function endCall() {
+        if(window.existingCall)
+            window.existingCall.close();
+        window.existingCall = null
+    }
 
     function muteAudio(status) {
         if(status == false)
@@ -200,7 +189,17 @@ peerapp = (function() {
         }
     }
 
-
+    function muteVideo(status) {
+        if(status == false)
+            status = false
+        else 
+            status = true
+        if(window.localStream) {
+            var videoTracks = window.localStream.getVideoTracks()
+            if(videoTracks && videoTracks[0])
+                videoTracks[0].enabled = status;
+        }
+    }
 
     function closeConnection(id) {
         var conns = peer.connections[peerId];
@@ -210,7 +209,6 @@ peerapp = (function() {
         }
     }
 
-    // Make sure things clean up properly.
     window.onunload = window.onbeforeunload = function(e) {
         if (!!peer && !peer.destroyed) {
             peer.destroy();
@@ -228,6 +226,7 @@ peerapp = (function() {
         });
     }
 
+    // Update Online users on every 5 seconds
     setInterval(function () {
         fetchOnlinePeers()
     }, 5000)
