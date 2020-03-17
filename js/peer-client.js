@@ -161,29 +161,7 @@ peerapp = (function() {
         }
     }
 
-    function initializeLocalMedia(options, callback) {
 
-        if(options) {
-            options['audio'] = true;
-            if(options['video'])
-                options['video'] = true;
-        } else {
-            options['audio'] = true;
-            options['video'] = false;
-        }
-
-        // Get audio/video stream
-        navigator.getUserMedia(options, function(stream) {
-            // Set your video displays
-            window.localStream = stream;
-            myapp.setMyVideo(window.localStream)
-            if(callback)
-                callback();
-        }, function(err) {
-            console.log("The following error occurred: " + err.name);
-            alert('Unable to call ' + err.name)
-        });
-    }
 
     function makeCall(callerID, isVideoCall) {
         console.log("Calling..." +  callerID)
